@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		43CAA3D42DA207A00029605D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 43CAA3D32DA207A00029605D /* README.md */; };
+		43CAA3D52DA207A00029605D /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 43CAA3D22DA207A00029605D /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		43CAA3982DA1F8910029605D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +32,8 @@
 		43CAA3872DA1F8900029605D /* heic2jpeg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = heic2jpeg.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		43CAA3972DA1F8910029605D /* heic2jpegTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = heic2jpegTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		43CAA3A12DA1F8910029605D /* heic2jpegUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = heic2jpegUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		43CAA3D22DA207A00029605D /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		43CAA3D32DA207A00029605D /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +82,8 @@
 		43CAA37E2DA1F8900029605D = {
 			isa = PBXGroup;
 			children = (
+				43CAA3D22DA207A00029605D /* .gitignore */,
+				43CAA3D32DA207A00029605D /* README.md */,
 				43CAA3892DA1F8900029605D /* heic2jpeg */,
 				43CAA39A2DA1F8910029605D /* heic2jpegTests */,
 				43CAA3A42DA1F8910029605D /* heic2jpegUITests */,
@@ -212,6 +221,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43CAA3D42DA207A00029605D /* README.md in Resources */,
+				43CAA3D52DA207A00029605D /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
