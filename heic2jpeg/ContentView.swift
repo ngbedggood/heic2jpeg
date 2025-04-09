@@ -13,45 +13,70 @@ struct ContentView: View {
     
     let context = CIContext()
     
-    @State private var selectedData: PhotosPickerItem? = nil
-    @State private var selectedImage: UIImage? = nil
+    @State private var selectedData: [PhotosPickerItem] = []
+    @State private var selectedImages: [UIImage] = []
+    
+    @State private var quality: Double = 80.0
+    @State private var estimatedFileSize = 0.0
+    
+    let columns: [GridItem] = [
+        GridItem(.adaptive(minimum: 80)) // Creates columns that adapt to available width
+    ]
     
     var body: some View {
-        
         VStack {
-            if let image = selectedImage {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 300)
-                        } else {
-                            Text("No image selected")
-                                .foregroundColor(.gray)
-                        }
-            
-            PhotosPicker(selection: $selectedData, matching: .images) {
-                Text("Select Photos")
+            Text("HEIC to JPEG Image Converter")
+                .fontWeight(.bold)
+                .font(.title2)
+            PhotosPicker(selection: $selectedData, maxSelectionCount: nil, matching: .images) {
+                    Text("Select Images")
             }
-            .buttonStyle(.borderedProminent)
-            
-        }
-        .onChange(of: selectedData) { _, newItem in
-                    Task {
-                        if let data = try? await newItem?.loadTransferable(type: Data.self),
-                        let uiImage = UIImage(data: data) {
-                            selectedImage = uiImage
-                        } else {
-                            print("Failed to load image data.")
+            .onChange(of: selectedData) { newItem in
+                Task {
+                    selectedImages = [] // Clear previous selections
+                    for item in newItem {
+                        if let data = try? await item.loadTransferable(type: Data.self) {
+                            if let uiImage = UIImage(data: data) {
+                                selectedImages.append(uiImage)
+                            }
                         }
                     }
                 }
-        .padding()
+            }
+            .buttonStyle(.bordered)
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 10) {
+                    ForEach(selectedImages, id: \.self) { image in
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                            .aspectRatio(1, contentMode: .fit) // Maintain square aspect ratio
+                            .cornerRadius(8)
+                    }
+                }
+            }
+            .padding()
+            .background(Color.gray.opacity(0.2))
+            Text("Output Quality")
+                .fontWeight(.bold)
+            HStack {
+                Slider(value: $quality, in: 10...100, step: 1.0)
+                Text("\(quality, specifier: "%.0f")%")
+            }
+            
+            Text("Estimated Average File Size: \(estimatedFileSize, specifier: "%.1f") mb")
+                .font(.caption)
+                .padding()
+            Button("Convert Images") {
+                
+            }
+            .buttonStyle(.borderedProminent)
 
-        
-        
+        }
+        .padding(20)
     }
 }
-
 #Preview {
     ContentView()
 }
