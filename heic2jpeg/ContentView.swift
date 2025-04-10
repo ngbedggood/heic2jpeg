@@ -17,7 +17,8 @@ struct ContentView: View {
     @State private var selectedImages: [UIImage] = []
     
     @State private var quality: Double = 80.0
-    @State private var estimatedFileSize = 0.0
+    @State private var estimatedFileSizeBefore = 0.0
+    @State private var estimatedFileSizeAfter = 0.0
     
     let columns: [GridItem] = [
         GridItem(.adaptive(minimum: 80)) // Creates columns that adapt to available width
@@ -38,9 +39,14 @@ struct ContentView: View {
                         if let data = try? await item.loadTransferable(type: Data.self) {
                             if let uiImage = UIImage(data: data) {
                                 selectedImages.append(uiImage)
+                                let size = Measurement(value: Double(data.count), unit: UnitInformationStorage.bytes)
+                                estimatedFileSizeBefore += size.converted(to: .megabytes).value
+                                // PLACEHOLDER NOT ACCURATE
+                                estimatedFileSizeAfter += size.converted(to: .megabytes).value * quality / 100
                             }
                         }
                     }
+                    
                 }
             }
             .buttonStyle(.bordered)
@@ -64,10 +70,19 @@ struct ContentView: View {
                 Slider(value: $quality, in: 10...100, step: 1.0)
                 Text("\(quality, specifier: "%.0f")%")
             }
+            .onChange(of: quality) {
+                // PLACEHOLDER NOT ACCURATE
+                estimatedFileSizeAfter = estimatedFileSizeBefore * quality / 100
+            }
             
-            Text("Estimated Average File Size: \(estimatedFileSize, specifier: "%.1f") mb")
-                .font(.caption)
-                .padding()
+            VStack {
+                Text("Estimated Average File Size Reduction:")
+                    .font(.caption)
+                Text("\(estimatedFileSizeBefore, specifier: "%.1f") MB -> \(estimatedFileSizeAfter, specifier: "%.1f") MB")
+                    .font(.caption)
+            }
+            .padding()
+            
             Button("Convert Images") {
                 
             }
