@@ -30,7 +30,7 @@ struct ContentView: View {
                 .fontWeight(.bold)
                 .font(.title2)
             PhotosPicker(selection: $selectedData, maxSelectionCount: nil, matching: .images) {
-                    Text("Select Images")
+                Text("Select Images")
             }
             .onChange(of: selectedData) { newItem in
                 Task {
@@ -84,14 +84,38 @@ struct ContentView: View {
             .padding()
             
             Button("Convert Images") {
+                for image in selectedImages {
+                    if let data = image.jpegData(compressionQuality: quality/100) {
+                        saveJpegDataToPhotoLibrary(jpegData: data)
+                    }
+                }
                 
             }
             .buttonStyle(.borderedProminent)
-
+            
         }
         .padding(20)
     }
+    
+    func saveJpegDataToPhotoLibrary(jpegData: Data) {
+            PHPhotoLibrary.shared().performChanges {
+                let creationRequest = PHAssetCreationRequest.forAsset()
+                creationRequest.addResource(with: .photo, data: jpegData, options: nil)
+            } completionHandler: { success, error in
+                DispatchQueue.main.async { // Update UI on the main thread
+                    if success {
+                        print("JPEG data saved successfully to Photo Library.")
+                        // Optionally show an alert or update UI to indicate success
+                    } else if let error = error {
+                        print("Error saving JPEG data: \(error.localizedDescription)")
+                        // Optionally show an alert with the error message
+                    }
+                }
+            }
+        }
+    
 }
+
 #Preview {
     ContentView()
 }
