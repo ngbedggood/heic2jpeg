@@ -9,12 +9,19 @@ import SwiftUI
 import CoreImage
 import PhotosUI
 
+struct FullScreenImageItem: Identifiable {
+    let id = UUID()
+    let image: UIImage
+}
+
 struct ContentView: View {
     
     let context = CIContext()
     
     @State private var selectedData: [PhotosPickerItem] = []
     @State private var selectedImages: [UIImage] = []
+    
+    @State private var fullScreenImageItem: FullScreenImageItem?
     
     @State private var quality: Double = 80.0
     @State private var estimatedFileSizeBefore = 0.0
@@ -32,7 +39,7 @@ struct ContentView: View {
             PhotosPicker(selection: $selectedData, maxSelectionCount: nil, matching: .images) {
                 Text("Select Images")
             }
-            .onChange(of: selectedData) { newItem in
+            .onChange(of: selectedData) { _, newItem in
                 Task {
                     selectedImages = [] // Clear previous selections
                     for item in newItem {
@@ -50,20 +57,28 @@ struct ContentView: View {
                 }
             }
             .buttonStyle(.bordered)
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 10) {
-                    ForEach(selectedImages, id: \.self) { image in
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                            .aspectRatio(1, contentMode: .fit) // Maintain square aspect ratio
-                            .cornerRadius(8)
+            NavigationStack {
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(selectedImages, id: \.self) { image in
+                            ZStack {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                                    .aspectRatio(1, contentMode: .fit)
+                                    .cornerRadius(8)
+                                    .onTapGesture {
+                                        fullScreenImageItem = FullScreenImageItem(image: image)
+                                    }
+                            }
+                        }
                     }
                 }
+                .padding()
+                .background(Color.gray.opacity(0.2))
             }
-            .padding()
-            .background(Color.gray.opacity(0.2))
+            
             Text("Output Quality")
                 .fontWeight(.bold)
             HStack {
@@ -95,6 +110,10 @@ struct ContentView: View {
             
         }
         .padding(20)
+        .fullScreenCover(item: $fullScreenImageItem) { item in
+            let image = Image(uiImage: item.image)
+            FullScreenImageView(image: image)
+        }
     }
     
     func saveJpegDataToPhotoLibrary(jpegData: Data) {
