@@ -21,6 +21,8 @@ struct ContentView: View {
     @State private var selectedData: [PhotosPickerItem] = []
     @State private var selectedImages: [UIImage] = []
     
+    @State private var isDelete: Bool = false
+    
     @State private var fullScreenImageItem: FullScreenImageItem?
     
     @State private var quality: Double = 80.0
@@ -36,9 +38,18 @@ struct ContentView: View {
             Text("HEIC to JPEG Image Converter")
                 .fontWeight(.bold)
                 .font(.title2)
-            PhotosPicker(selection: $selectedData, maxSelectionCount: nil, matching: .images) {
-                Text("Select Images")
+            HStack {
+                PhotosPicker(selection: $selectedData, maxSelectionCount: nil, matching: .images) {
+                    Text("Select Images")
+                }
+                Button("Remove Images") {
+                    isDelete.toggle()
+                }
+                .buttonStyle(.bordered)
+                .tint(.red)
+                .disabled(selectedImages.isEmpty)
             }
+            
             .onChange(of: selectedData) { _, newItem in
                 Task {
                     selectedImages = [] // Clear previous selections
@@ -53,8 +64,8 @@ struct ContentView: View {
                             }
                         }
                     }
-                    
                 }
+                selectedData = []
             }
             .buttonStyle(.bordered)
             NavigationStack {
@@ -70,7 +81,16 @@ struct ContentView: View {
                                     .cornerRadius(8)
                                     .onTapGesture {
                                         fullScreenImageItem = FullScreenImageItem(image: image)
+                                    
                                     }
+                                if isDelete {
+                                    Button("Delete", systemImage: "xmark.circle.fill") {
+                                        selectedImages.remove(at: selectedImages.firstIndex(of: image)!)
+                                    }
+                                    .font(.title)
+                                    .foregroundStyle(.red)
+                                    .labelStyle(.iconOnly)
+                                }
                             }
                         }
                     }
